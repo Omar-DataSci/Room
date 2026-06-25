@@ -1,0 +1,747 @@
+/* ================= 1. الإعدادات العامة ولوحة الألوان ================= */
+:root {
+    --bg-dark-purple: #1e122b;
+    --cozy-sunset: #6d4c7b;
+    --warm-orange: #e8a382;
+    --text-white: #f5f0fa;
+    --glass-blur: rgba(255, 255, 255, 0.08);
+    --retro-font: 'Press Start 2P', monospace;
+    --cozy-font: 'Comfortaa', cursive;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #0b0513;
+    font-family: var(--cozy-font);
+    color: var(--text-white);
+    overflow: hidden; /* لمنع ظهور أشرطة التمرير المزعجة والحفاظ على أبعاد اللعبة */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* حاوية اللعبة الرئيسية - تحاكي شاشة الكمبيوتر الكلاسيكية */
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    max-width: 1200px;
+    max-height: 675px; /* أبعاد 16:9 المثالية للألعاب */
+    position: relative;
+    background-color: var(--bg-dark-purple);
+    border: 4px solid #2d1b3f;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* ================= 2. إدارة الغرف والتنقل ================= */
+.room {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: opacity 0.8s ease-in-out, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+    background-size: cover;
+    background-position: center;
+}
+
+/* التحكم في إظهار وإخفاء الغرف بنعومة */
+.room.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+.room.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+}
+
+.room-label {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-family: var(--retro-font);
+    font-size: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 12px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+/* أزرار العودة */
+.nav-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: var(--glass-blur);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-white);
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--cozy-font);
+    backdrop-filter: blur(10px);
+    transition: background 0.3s, transform 0.2s;
+    z-index: 10;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-3px);
+}
+
+/* ================= 3. غرفتك: LEVEL 1 ================= */
+#your-room {
+    background-image: linear-gradient(to bottom, #1a0b2e, #432354);
+}
+
+/* نقاط التفاعل (الـ Hitboxes الشفافة التي سنضع فوقها الصور لاحقاً) */
+.interactive-element {
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.3s, filter 0.3s;
+}
+
+.interactive-element:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 0 8px var(--warm-orange));
+}
+
+/* تحديد مواقع العناصر بناءً على الرسوم الكرتونية */
+.window {
+    width: 25%;
+    height: 55%;
+    top: 10%;
+    left: 3%;
+    border: 3px solid #2d1b4e;
+    background: linear-gradient(to top, #e8a382, #6d4c7b);
+    border-radius: 6px;
+}
+
+.shelf {
+    width: 30%;
+    height: 15%;
+    top: 8%;
+    left: 32%;
+    background: hsla(36, 85%, 43%, 0.282);
+
+}
+
+.server-rack {
+    width: 15%;
+    height: 35%;
+    bottom: 10%;
+    left: 55%;
+    background: rgba(3, 90, 128, 0.2);
+
+}
+
+.sliding-door {
+    width: 18%;
+    height: 75%;
+    bottom: 5%;
+    right: 5%;
+    background-color: #3d224e;
+    border-left: 4px solid #251333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-prompt {
+    font-family: var(--retro-font);
+    font-size: 12px;
+    background: #000;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--text-white);
+}
+
+/* شخصيتك الكرتونية */
+.creator-boy {
+    position: absolute;
+    width: 20%;
+    height: 50%;
+    bottom: 15%;
+    left: 28%;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.05); /* مؤقت حتى نضع صورة البكسل */
+    border-radius: 8px;
+}
+
+/* فقاعة الكلام الكلاسيكية لـ "Bro, don't annoy me" */
+.speech-bubble {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%) scale(0);
+    background: white;
+    color: black;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: bold;
+    border-radius: 8px;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 8px 8px 0;
+    border-style: solid;
+    border-color: white transparent;
+}
+
+.speech-bubble.show {
+    transform: translateX(-50%) scale(1);
+}
+
+/* ================= 4. غرفة الفضفضة: MOOD ROOM ================= */
+#mood-room {
+    background: linear-gradient(135deg, #2b1042, #10051d);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* كبسولة الكتابة الزجاجية */
+.text-capsule {
+    background: var(--glass-blur);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 30px;
+    border-radius: 16px;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    margin-bottom: 20px;
+}
+
+.text-capsule h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+#vent-input {
+    width: 100%;
+    height: 120px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-white);
+    padding: 12px;
+    font-family: var(--cozy-font);
+    resize: none;
+    outline: none;
+    transition: border 0.3s;
+}
+
+#vent-input:focus {
+    border-color: var(--warm-orange);
+}
+
+#vent-submit, #emergency-btn {
+    background: #e8a382;
+    color: #1e122b;
+    border: none;
+    padding: 12px 24px;
+    font-family: var(--cozy-font);
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#vent-submit:hover, #emergency-btn:hover {
+    background: #f1beaa;
+    transform: translateY(-2px);
+}
+
+#emergency-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: transparent;
+    color: #e8a382;
+    border: 2px solid #e8a382;
+    padding: 10px 20px;
+    font-family: var(--cozy-font);
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    z-index: 10;
+}
+
+/* ================= 5. شاشة العرض والأوفرلاي المتراكب ================= */
+#game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(11, 5, 19, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    transition: opacity 0.4s ease;
+}
+
+.overlay-card {
+    background: #251538;
+    border: 2px solid var(--warm-orange);
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 450px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.overlay-card p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+#close-overlay {
+    background: var(--text-white);
+    color: #1e122b;
+    border: none;
+    padding: 8px 20px;
+    font-family: var(--retro-font);
+    font-size: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* كلاسات مساعدة للتحكم البرمجي */
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+    display: none !important; /* للإخفاء التام من الشجرة */
+}
+
+.fade-in {
+    animation: fadeIn 1.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+/* ================= 6. الحديقة السرية: THE GARDEN ================= */
+#the-garden {
+    /* تدرج ليلي ساحر يبدأ من بنفسجي الغروب وينتهي بأخضر الحديقة الداكن */
+    background: linear-gradient(to bottom, #140727, #231c42, #1b2e24);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* لجعله تبدو مستلقية على العشب في الأسفل */
+    align-items: center;
+    position: relative;
+}
+
+/* حاوية السماء التفاعلية */
+#star-canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 65%; /* تغطي الجزء العلوي من الشاشة */
+    cursor: crosshair; /* يتغير شكل الفأرة ليوحي بوضع النجوم */
+    z-index: 1;
+}
+
+.garden-instructions {
+    position: absolute;
+    top: 80px;
+    text-align: center;
+    width: 100%;
+    font-size: 12px;
+    color: var(--warm-orange);
+    font-family: var(--retro-font);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    pointer-events: none; /* لكي لا تعيق الضغط على السماء */
+}
+
+/* النجوم البرمجية التي ستولد عند الضغط */
+.generated-star {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ffffff, 0 0 20px #e8a382;
+    animation: pulse 1.5s infinite alternate;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* شخصيتها وهي مستلقية على العشب */
+.zoli-grass {
+    position: absolute;
+    width: 25%;
+    height: 20%;
+    bottom: 8%;
+    right: 20%;
+    background-color: rgba(255, 255, 255, 0.05); /* مؤقت حتى نضع صورة البكسل */
+    border-radius: 8px;
+    z-index: 3;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.8); opacity: 0.6; }
+    100% { transform: scale(1.3); opacity: 1; }
+}   
+/* الإخفاء المطلق والعزل التام للرسالة السرية في الحديقة */
+.hidden-letter {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    width: 85%;
+    max-width: 500px;
+    background: rgba(20, 10, 30, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(232, 163, 130, 0.3);
+    padding: 20px;
+    border-radius: 12px;
+    z-index: 99;
+    
+    /* منع الظهور البصري تماماً قبل توليد 18 نجمة */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s;
+}
+
+/* الكلاس التنشيطي عند تولد 18 نجمة في الوقت المناسب */
+.hidden-letter.reveal-letter {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+/* ================= 8. أنيميشن الحركات الجديدة (Omar's Action States) ================= */
+
+/* حالة النوم والظلام التلقائي */
+.sleeping-mode {
+    opacity: 0.7;
+    filter: brightness(0.5) drop-shadow(0 0 5px #4a3b68);
+    transform: translateY(10px) rotate(5deg); /* يبدو كأنه منحنٍ على المكتب */
+}
+
+/* حركة تمرين العقلة */
+.doing-pullups {
+    animation: pullUpAnimation 1s infinite ease-in-out;
+}
+
+@keyframes pullUpAnimation {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-40px); border-bottom: 3px solid var(--warm-orange); } /* يصعد للأعلى نحو قضيب العقلة */
+}
+
+/* حركة استعراض العضلات والفخر */
+.flexing-muscles {
+    animation: flexAnimation 0.5s infinite alternate;
+    filter: drop-shadow(0 0 10px #e8a382);
+}
+
+@keyframes flexAnimation {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1) skewX(2deg); } /* يتضخم حجم السبرايت دلالة على القوة والمزاح */
+}
+
+/* عندما يرفض بغضب طريف */
+.boy-stubborn {
+    border: 2px dashed #ff4a4a !important;
+}
+
+/* ستايل مشهد الحلم السحري */
+.dream-scene {
+    padding: 10px;
+    font-family: var(--cozy-font);
+    animation: floatDream 2s infinite alternate ease-in-out;
+}
+
+@keyframes floatDream {
+    from { transform: translateY(0); }
+    to { transform: translateY(-8px); }
+}
+
+/* ================= 9. واجهة سيرفر أطلس ولوحة التحكم السيرية ================= */
+
+/* تنسيق صندوق الفضفضة الوحيد ليكون متوسطاً ومثالي الأبعاد */
+
+/* الشاشة الخلفية المظلمة للسيرفر */
+.hidden-dashboard {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 5, 18, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    transition: opacity 0.5s ease;
+}
+
+/* الحاوية المركزية للوحة تحكم السيرفر */
+.dashboard-container {
+    width: 90%;
+    max-width: 900px;
+    height: 85vh;
+    max-height: 550px;
+    background: #140d1f;
+    border: 2px solid #e8a382;
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(232, 163, 130, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* هيدر السيرفر */
+.dashboard-header {
+    background: rgba(232, 163, 130, 0.1);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(232, 163, 130, 0.3);
+}
+
+.dashboard-header h2 {
+    font-family: var(--retro-font);
+    font-size: 12px;
+    color: var(--warm-orange);
+    letter-spacing: 1px;
+}
+
+#close-dashboard {
+    background: transparent;
+    border: 1px solid #ff4a4a;
+    color: #ff4a4a;
+    padding: 5px 12px;
+    font-family: var(--cozy-font);
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+#close-dashboard:hover {
+    background: #ff4a4a;
+    color: white;
+}
+
+/* تقسيم الصناديق داخل السيرفر */
+.dashboard-grid {
+    display: flex;
+    gap: 20px;
+    padding: 25px;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.dashboard-card {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(232, 163, 130, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.dashboard-card h3 {
+    font-family: var(--cozy-font);
+    color: var(--warm-orange);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+#capsule-input {
+    width: 100%;
+    height: 100%;
+    min-height: 160px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: white;
+    padding: 12px;
+    resize: none;
+    outline: none;
+    font-family: var(--cozy-font);
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+#capsule-submit {
+    width: 100%;
+    background: #e8a382;
+    color: #140d1f;
+    border: none;
+    padding: 12px;
+    font-family: var(--cozy-font);
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#capsule-submit:hover {
+    background: #f1beaa;
+}
+
+/* الرسالة الطويلة داخل السيرفر */
+.scrollable-letter {
+    max-height: 280px;
+    overflow-y: auto;
+    text-align: left;
+    padding-right: 8px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #e2daf0;
+}
+
+.scrollable-letter::-webkit-scrollbar { width: 5px; }
+.scrollable-letter::-webkit-scrollbar-thumb { background: #e8a382; border-radius: 4px; }
+
+.bragging-footer {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(232, 163, 130, 0.05);
+    padding: 8px;
+    border-radius: 6px;
+    border-left: 3px solid #e8a382;
+}
+
+.bragging-face-sprite {
+    width: 35px;
+    height: 35px;
+    background-color: #e8a382;
+    border-radius: 50%;
+}
+
+/* تأثير التحديق والمحدقة الحاد (Staring Contest Flash) */
+.staring-contest-active {
+    animation: staringPulse 0.5s infinite alternate;
+    box-shadow: 0 0 15px rgba(232, 163, 130, 0.6);
+    border: 1px solid var(--warm-orange);
+}
+
+@keyframes staringPulse {
+    from { transform: scale(1); filter: brightness(1); }
+    to { transform: scale(1.03); filter: brightness(1.2); } /* السبرايت يقترب قليلاً دليلاً على التركيز والمحدقة */
+}
+
+/* ================= 10. تأثيرات الاهتزاز التفاعلي لوضع النوم ================= */
+
+/* الاهتزاز الأول: خفيف وتنبيهي */
+.shake-level-1 {
+    animation: mildShake 0.2s ease-in-out infinite;
+}
+
+/* الاهتزاز الثاني: عنيف ومضطرب يوحي باقتراب الانفجار البصري */
+.shake-level-2 {
+    animation: heavyShake 0.15s linear infinite;
+    filter: brightness(1.3) drop-shadow(0 0 8px #ff4a4a);
+}
+
+@keyframes mildShake {
+    0%, 100% { transform: translateY(10px) rotate(5deg) translateX(0); }
+    25% { transform: translateY(10px) rotate(4deg) translateX(-2px); }
+    75% { transform: translateY(10px) rotate(6deg) translateX(2px); }
+}
+
+@keyframes heavyShake {
+    0%, 100% { transform: translateY(10px) rotate(5deg) translate(0, 0); }
+    20% { transform: translateY(10px) rotate(2deg) translate(-4px, 2px); }
+    40% { transform: translateY(10px) rotate(8deg) translate(4px, -2px); }
+    60% { transform: translateY(10px) rotate(3deg) translate(-4px, -2px); }
+    80% { transform: translateY(10px) rotate(7deg) translate(4px, 2px); }
+}
+
+/* حركة التلاشي السحرية لدخول شاشة الحلم بمرونة */
+.fade-to-dream-flash {
+    animation: dreamFlash 0.8s ease-out forwards;
+}
+
+@keyframes dreamFlash {
+    0% { filter: brightness(1) blur(0px); }
+    50% { filter: brightness(3) blur(4px); background: #fff; }
+    100% { filter: brightness(1) blur(0px); }
+}
+
+/* تحجيم الغرفة واحتواء عناصرها */
+.mood-room-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* صندوق الفضفضة: تثبيت مكانه وحجمه */
+
+/* تأمين زر العودة */
+#back-to-room {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+/* ================= أسطر مضافة لإصلاح غرفة الفضفضة ================= */
+
+/* تثبيت أبعاد صندوق الفضفضة وعزله عن التداخل */
+.single-vent-box {
+    position: relative; /* لتجنب الطفو العشوائي */
+    width: 420px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 25px;
+    border-radius: 12px;
+    margin-top: 40px;
+    z-index: 10;
+}
+
+/* تأمين تموضع الأزرار داخل الغرفة بشكل مستقل */
+#mood-room .nav-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+#emergency-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 15;
+}

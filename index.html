@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Somewhere Calm - For Zoli 🤍</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <audio id="bg-music" loop src="assets/audio/rain.mp3"></audio>
+
+    <div id="game-container">
+
+        <!-- ====== ROOM 1: OMAR'S WORKSPACE ====== -->
+        <section id="your-room" class="room active">
+            <div class="interactive-element window" id="window-target" title="Look outside → The Garden"></div>
+            <div class="interactive-element shelf" id="shelf-target" title="Inspect the shelf"></div>
+            <div class="interactive-element server-rack" id="atlas-target" title="Open Atlas Server"></div>
+            <div class="character-sprite creator-boy" id="boy-target" title="Poke Omar">
+                <div class="speech-bubble" id="boy-speech">Bro, don't annoy me.</div>
+            </div>
+            <div class="interactive-element sliding-door" id="door-to-mood" title="Enter Mood Room">
+                <span class="action-prompt">ENTER</span>
+            </div>
+            <div class="room-label">LEVEL 1: OMAR'S WORKSPACE</div>
+        </section>
+
+        <!-- ====== ROOM 2: MOOD ROOM ====== -->
+        <section id="mood-room" class="room hidden">
+            <div class="mood-room-container">
+                <button class="nav-btn" id="back-to-room">← Go Back</button>
+                <div class="text-capsule single-vent-box">
+                    <h3>Write it down, let it go.</h3>
+                    <textarea id="vent-input" placeholder="What is stressing you today, Zoli?"></textarea>
+                    <button id="vent-submit">Release into Space ✨</button>
+                </div>
+                <button id="emergency-btn">I Had a Bad Day 🤍</button>
+            </div>
+            <div class="room-label">MOOD ROOM: THE SAFE TAB</div>
+        </section>
+
+        <!-- ====== ROOM 3: THE GARDEN ====== -->
+        <section id="the-garden" class="room hidden">
+            <button class="nav-btn" id="back-from-garden">← Leave Garden</button>
+            <div id="star-canvas-container">
+                <p class="garden-instructions">Click the sky to create 18 stars...</p>
+            </div>
+            <div id="secret-birthday-letter" class="hidden">
+                <div class="letter-content">
+                    <h2>To Zoli, on your 18th Chapter ✨</h2>
+                    <p>You didn't walk this far to stop this far.</p>
+                    <p>Whenever life gets too loud, remember that you have a whole universe right here, built just for you. Happy Birthday! 🎆</p>
+                </div>
+            </div>
+            <div class="room-label">THE GARDEN: CLOUD 30</div>
+        </section>
+
+        <!-- ====== ATLAS SERVER DASHBOARD ====== -->
+        <div id="atlas-dashboard" class="hidden-dashboard hidden">
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <h2>ATLAS SERVER V1.0 [Status: ONLINE]</h2>
+                    <button id="close-dashboard">✖ Shutdown Session</button>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <h3>🔒 Time Capsule Protocol</h3>
+                        <p class="capsule-subtext">Sealed on local hardware until June 30, 2027</p>
+                        <textarea id="capsule-input" placeholder="Write a message to your future self..."></textarea>
+                        <button id="capsule-submit">Seal & Encrypt Capsule</button>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3>📜 Log_01: Message from Omery</h3>
+                        <div class="scrollable-letter">
+                            <p>Hey Zoli,</p>
+                            <p>If you are reading this, it means you've successfully logged into the Atlas core files. Congratulations, you are officially stubborn enough to bypass my security! 😂</p>
+                            <p>On a serious note, I wanted to build this small world for you. A place where the noise of the world and the stress of the day can't reach you. Whenever things get heavy, just remember how far you've come. You didn't walk this far to stop this far, right?</p>
+                            <p>I know you'll do amazing things in this 18th chapter of your life. Keep pushing forward, stay stubborn, and remember that your home server is holding this universe stable for you 24/7.</p>
+                            <p>Anyway, I'll stop being dramatic now...</p>
+                            <hr>
+                            <div class="bragging-footer">
+                                <p>Yeah, yeah... admit it, I'm just too good at this programming thing. Haha! ~ 😎</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== GAME OVERLAY (popup messages) ====== -->
+        <div id="game-overlay" class="hidden">
+            <div class="overlay-card">
+                <p id="overlay-text"></p>
+                <button id="close-overlay">Resume Game</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
